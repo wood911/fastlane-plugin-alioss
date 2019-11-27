@@ -1,0 +1,77 @@
+.App {
+  text-align: center;
+  background-color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /*justify-content: center;*/
+  font-size: calc(10px + 1.5vmin);
+  color: black;
+  padding: 30px;
+}
+
+.App-line {
+  border-top: 1px solid #e7ebed;
+  width: 100%;
+}
+
+.App-icon {
+  max-width: 120px;
+  max-height: 120px;
+  border-radius: 20px;
+}
+
+.App-box-0 {
+  cursor: pointer;
+  width: 100%;
+  height: 36px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 0.1vmin);
+  background-color: #f2f6f8;
+}
+.App-box-1 {
+  cursor: pointer;
+  width: 100%;
+  height: 36px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 0.1vmin);
+  background-color: white;
+}
+
+.App-box-0:hover {
+  background-color:mistyrose;
+}
+.App-box-1:hover {
+  background-color:mistyrose;
+}
+
+.App-detail-text {
+  font-size: calc(10px + 0.8vmin);
+  color: #666666;
+}
+
+.App-install-button {
+  cursor: pointer;
+  background-color: #28caad;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 8px 60px;
+  border-radius: 30px;
+  color: white;
+  margin-bottom: 20vmin;
+}
+
+.App-logo {
+  height: 40vmin;
+}
+
+.App-link {
+  color: #09d3ac;
+}

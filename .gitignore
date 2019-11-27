@@ -15,3 +15,22 @@ test-results
 *.iml
 *.log
 .DS_Store
+
+
+
+
+# alioss-index-html dependencies
+alioss-index-html/node_modules
+
+# testing
+alioss-html/coverage
+
+# production
+alioss-index-html/build
+
+# misc
+alioss-index-html/.DS_Store
+
+alioss-index-html/npm-debug.log*
+alioss-index-html/yarn-debug.log*
+alioss-index-html/yarn-error.log*
