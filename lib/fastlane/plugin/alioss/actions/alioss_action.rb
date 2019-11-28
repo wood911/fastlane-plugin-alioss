@@ -15,13 +15,14 @@ module Fastlane
         access_key_id = params[:access_key_id]
         access_key_secret = params[:access_key_secret]
         path_for_app_name = params[:app_name]
+        html_header_title = params[:html_header_title]
 
         build_file = [
             params[:ipa],
             params[:apk]
         ].detect { |e| !e.to_s.empty? }
 
-        # build_file = "/Users/wood/Documents/SuperbuyApp/build/output/Beta_20191126212633/Superbuy.ipa"
+        # build_file = "/Users/wood/Documents/SuperbuyApp/build/output/Beta_20191127202707/Superbuy.ipa"
 
         if build_file.nil?
           UI.user_error!("请提供构建文件")
@@ -73,8 +74,7 @@ module Fastlane
         unless bucket.object_exists?("#{path_for_app_name}/index.html")
           UI.message "配置文件不存在，初始化#{path_for_app_name}/index.html"
           index_html_file = self.create_index_html_file(
-              download_domain: download_domain,
-              path_for_app_name: path_for_app_name
+              html_header_title: html_header_title
           )
           bucket.put_object("#{path_for_app_name}/index.html", :file => File.expand_path(index_html_file))
           # 上传完成后删除本地文件
@@ -265,6 +265,12 @@ module Fastlane
                                          description: "下载域名，默认是https://{bucket_name}.{endpoint}/",
                                          optional: true,
                                          type: String),
+            FastlaneCore::ConfigItem.new(key: :html_header_title,
+                                         env_name: "ALIOSS_HTML_HEADER_TITLE",
+                                         description: "html下载页面header title",
+                                         default_value: "很高兴邀请您安装我们的App，测试并反馈问题，便于我们及时解决您遇到的问题，十分谢谢！Thanks♪(･ω･)ﾉ",
+                                         optional: true,
+                                         type: String),
             FastlaneCore::ConfigItem.new(key: :update_description,
                                          env_name: "ALIOSS_UPDATE_DESCRIPTION",
                                          description: "设置app更新日志，描述你修改了哪些内容。",
@@ -355,7 +361,8 @@ module Fastlane
         if File.readable?(filename)
           temp_file = File.new(temp_filename, "w")
           IO.foreach(filename) do |block|
-            temp_file.puts(block.gsub("your_config_json_url", "#{params[:download_domain]}#{params[:path_for_app_name]}/config.json"))
+            # temp_file.puts(block.gsub("your_config_json_url", "#{params[:download_domain]}#{params[:path_for_app_name]}/config.json"))
+            temp_file.puts(block.gsub("__html_header_title__", params[:html_header_title]))
           end
           temp_file.close
           return temp_file

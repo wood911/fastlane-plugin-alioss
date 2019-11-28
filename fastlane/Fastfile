@@ -1,3 +1,26 @@
 lane :test do
   alioss
 end
+
+lane :beta do
+  upload_to_alioss(mode: "debug")
+end
+
+
+def upload_to_alioss(param)
+  description = "正式环境"
+  print "====== upload_to_alioss ======\nparam入参：#{param}\n"
+  if param[:mode] == "debug"
+    description = "测试环境"
+  end
+  # 上传App到阿里云oss服务器
+  alioss(
+    endpoint: "oss-cn-shenzhen.aliyuncs.com",
+    access_key_id: "xxx",
+    access_key_secret: "xxx",
+    bucket_name: "app-test",
+    app_name: "app/superbuy",
+    download_domain: "https://dl.yourdomain.com/",
+    update_description: "#{param[:desc]}\n#{description}"
+  )
+end

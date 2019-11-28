@@ -20,6 +20,14 @@ upload ipa/apk to aliyun oos server, and scan QRcode to install app on mobile ph
 
 Check out the [example `Fastfile`](fastlane/Fastfile) to see how to use this plugin. Try it by cloning the repo, running `fastlane install_plugins` and `bundle exec fastlane test`.
 
+or <br>
+
+Add <br>
+`gem 'fastlane-plugin-alioss', git: 'https://github.com/woodtengfei/fastlane-plugin-alioss'`  or <br> 
+`gem 'fastlane-plugin-alioss'`  <br>
+to Gemfile. running `bundle install`.
+
+
 Just specify the `endpoint` , `access_key_id` , `bucket_name` associated with your pgyer account.
 
 ```

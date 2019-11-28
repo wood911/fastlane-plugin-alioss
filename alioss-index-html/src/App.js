@@ -3,6 +3,7 @@ import './App.css';
 import fetch from 'node-fetch';
 import DeviceDetector from 'device-detector-js';
 import format from 'date-format';
+import QRCode from 'qr-code-with-logo';
 
 class App extends React.Component {
   constructor(props) {
@@ -11,12 +12,14 @@ class App extends React.Component {
     this.selectRow = this.selectRow.bind(this);
     const device = new DeviceDetector().parse(navigator.userAgent);
     this.state = {
-      url: "https://superbuy-cn-app-test.oss-cn-shenzhen.aliyuncs.com/app/superbuy/config.json",
+      url: "config.json",
       device: device,
       list: [],
       current: null,
-      isInstalling: false
+      isInstalling: false,
+      headerTitle: "__html_header_title__"
     };
+    this.ref = React.createRef()
   }
 
   componentDidMount () {
@@ -40,6 +43,21 @@ class App extends React.Component {
       });
   }
 
+  componentDidUpdate (prevProps, prevState, snapshot) {
+    const canvas = this.ref.current;
+    if (canvas) {
+      QRCode.toCanvas({
+        canvas: canvas,
+        content: window.location.href,
+        width: 260,
+        logo: {
+          src: 'icon.png',
+          radius: 8
+        }
+      })
+    }
+  }
+
   installApp () {
     const { current, device } = this.state;
     if (current) {
@@ -52,6 +70,7 @@ class App extends React.Component {
         window.location.href = current.domain + current.path + current.name;
       }
     }
+    console.log(this.refs.qrcode)
   }
 
   selectRow (value) {
@@ -59,11 +78,11 @@ class App extends React.Component {
   }
 
   render() {
-    const { list, current, isInstalling } = this.state;
+    const { list, current, isInstalling, headerTitle } = this.state;
     if (!current || list.length === 0) {
       return (
         <div className="App">
-          <p>很高兴邀请您安装Superbuy App，测试并反馈问题，便于我们及时解决您遇到的问题，十分谢谢！Thanks♪(･ω･)ﾉ</p>
+          <p>{headerTitle}</p>
           <img src={"icon.png"} className="App-icon" alt={""}/>
           <p>Sorry，未找到任何软件包！</p>
         </div>
@@ -71,18 +90,19 @@ class App extends React.Component {
     }
     return (
       <div className="App">
-        <p>很高兴邀请您安装Superbuy App，测试并反馈问题，便于我们及时解决您遇到的问题，十分谢谢！Thanks♪(･ω･)ﾉ</p>
+        <p>{headerTitle}</p>
         <img src={"icon.png"} className="App-icon" alt={""}/>
-        <p className="App-detail-text">版本：{current.version} (build {current.build}) 更新时间 ：{format('yyyy-MM-dd hh:mm:ss', new Date(current.time * 1000))}</p>
+        <p className="App-detail-text">版本：{current.version} (build {current.build})  大小：{(current.size/1024/1024).toFixed(2)} MB  更新时间 ：{format('yyyy-MM-dd hh:mm:ss', new Date(current.time * 1000))}</p>
+        <div className="App-update-desc">{current.desc}</div>
         <button id="install-app" className="App-install-button" onClick={this.installApp}>{
           isInstalling ? "正在安装..." : "安装App"
         }</button>
+        <canvas ref={this.ref} />
         <div className="App-line"> </div>
         <p>历史版本</p>
         <div style={{border: "1px solid #e7ebed", width: "100%"}}>
           {
             list.map((value, index) => {
-              console.log(value);
               const className = index % 2 === 0 ? "App-box-0" : "App-box-1";
               return (
                 <div key={index} className={className} onClick={()=>{this.selectRow(value)}}>
