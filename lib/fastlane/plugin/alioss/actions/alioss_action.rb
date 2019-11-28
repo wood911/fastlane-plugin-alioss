@@ -85,12 +85,21 @@ module Fastlane
         file_size = File.size(build_file)
         filename = File.basename(build_file)
 
+        # 获取 build_number & version_number
+        build_number = Actions.lane_context[SharedValues::BUILD_NUMBER]
+        version_number = Actions.lane_context[SharedValues::VERSION_NUMBER]
+
         # 根据不同的文件类型区分平台，拼接bucket_path路径
         case File.extname(filename)
         when ".ipa"
           bucket_path = "#{path_for_app_name}/iOS"
         when ".apk"
           bucket_path = "#{path_for_app_name}/Android"
+          build_number = Actions.lane_context[SharedValues::ANDROID_VERSION_CODE]
+          version_number = Actions.lane_context[SharedValues::ANDROID_VERSION_NAME]
+          if build_number.nil || version_number.nil?
+            UI.important "ANDROID_VERSION_CODE & ANDROID_VERSION_NAME is nil，请设置 Actions.lane_context[SharedValues::ANDROID_VERSION_NAME] = version_name，推荐在fastlane中配置fastlane-plugin-versioning_android。"
+          end
         when ".app"
           bucket_path = "#{path_for_app_name}/Mac"
         else
@@ -111,9 +120,9 @@ module Fastlane
         config_json_file_path = File.expand_path('config.json')
         bucket.get_object("#{path_for_app_name}/config.json", :file => config_json_file_path)
         config_json = JSON.parse(File.read(config_json_file_path))
-        # 获取 build_number & version_number
-        build_number = Actions.lane_context[SharedValues::BUILD_NUMBER]
-        version_number = Actions.lane_context[SharedValues::VERSION_NUMBER]
+
+        UI.message "build_number: #{build_number}  version_number: #{version_number}"
+
         # 构建文件元信息
         item_hash = {
             "domain" => download_domain,

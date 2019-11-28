@@ -78,6 +78,11 @@
   color: #666666;
 }
 
+.App-history-version {
+  border: 1px solid #e7ebed;
+  width: 100%;
+}
+
 .App-logo {
   height: 40vmin;
 }

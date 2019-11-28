@@ -38,8 +38,8 @@ class App extends React.Component {
         } else if (device.device.type === 'desktop') { // pc
           list = [...ipaList, ...apkList,  ...appList]
         }
-        // list.pop()获取最新软件包
-        this.setState({list: [...list], current: list.pop()})
+        list = [...list].sort((a, b) => a.time < b.time ? 1 : -1)
+        this.setState({list: [...list], current: list.length ? list[0] : null})
       });
   }
 
@@ -78,7 +78,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { list, current, isInstalling, headerTitle } = this.state;
+    const { list, current, isInstalling, headerTitle, device } = this.state;
     if (!current || list.length === 0) {
       return (
         <div className="App">
@@ -100,12 +100,16 @@ class App extends React.Component {
         <canvas ref={this.ref} />
         <div className="App-line"> </div>
         <p>历史版本</p>
-        <div style={{border: "1px solid #e7ebed", width: "100%"}}>
+        <div className="App-history-version">
           {
             list.map((value, index) => {
               const className = index % 2 === 0 ? "App-box-0" : "App-box-1";
               return (
                 <div key={index} className={className} onClick={()=>{this.selectRow(value)}}>
+                  {
+                    device.device.type === 'desktop' &&
+                    <p style={{marginRight: "10%"}}>{value.name}</p>
+                  }
                   <p style={{marginRight: "10%"}}>{value.version} (build {value.build} )</p>
                   <p>{format('yyyy-MM-dd hh:mm:ss', new Date(value.time * 1000))}</p>
                 </div>
