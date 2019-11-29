@@ -103,9 +103,9 @@ module Fastlane
             version_number = apk_output_json.first["apkInfo"]["versionName"]
           end
           # 如果output.json文件里取不到则从Actions.lane_context中取
-          if build_number.nil? || version_number.nil
+          if build_number.nil? || version_number.nil?
             if Actions.lane_context[:ANDROID_VERSION_NAME].nil? || Actions.lane_context[:ANDROID_VERSION_CODE].nil?
-              UI.important "Actions.lane_context 不包含[ANDROID_VERSION_NAME, ANDROID_VERSION_CODE]，请配置fastlane env，推荐使用fastlane-plugin-versioning_android。"
+              UI.important "Actions.lane_context 不包含[ANDROID_VERSION_NAME, ANDROID_VERSION_CODE]，请配置fastlane env。"
             else
               build_number = Actions.lane_context[SharedValues::ANDROID_VERSION_CODE]
               version_number = Actions.lane_context[SharedValues::ANDROID_VERSION_NAME]
