@@ -95,10 +95,21 @@ module Fastlane
           bucket_path = "#{path_for_app_name}/iOS"
         when ".apk"
           bucket_path = "#{path_for_app_name}/Android"
-          build_number = Actions.lane_context[SharedValues::ANDROID_VERSION_CODE]
-          version_number = Actions.lane_context[SharedValues::ANDROID_VERSION_NAME]
-          if build_number.nil || version_number.nil?
-            UI.important "ANDROID_VERSION_CODE & ANDROID_VERSION_NAME is nil，请设置 Actions.lane_context[SharedValues::ANDROID_VERSION_NAME] = version_name，推荐在fastlane中配置fastlane-plugin-versioning_android。"
+          # versionName、versionCode先从output.json文件里取
+          apk_output_json_path = File.join(File.dirname(build_file), "output.json")
+          if File.readable?(apk_output_json_path)
+            apk_output_json = JSON.parse(File.read(apk_output_json_path))
+            build_number = apk_output_json.first["apkInfo"]["versionCode"]
+            version_number = apk_output_json.first["apkInfo"]["versionName"]
+          end
+          # 如果output.json文件里取不到则从Actions.lane_context中取
+          if build_number.nil? || version_number.nil
+            if Actions.lane_context[:ANDROID_VERSION_NAME].nil? || Actions.lane_context[:ANDROID_VERSION_CODE].nil?
+              UI.important "Actions.lane_context 不包含[ANDROID_VERSION_NAME, ANDROID_VERSION_CODE]，请配置fastlane env，推荐使用fastlane-plugin-versioning_android。"
+            else
+              build_number = Actions.lane_context[SharedValues::ANDROID_VERSION_CODE]
+              version_number = Actions.lane_context[SharedValues::ANDROID_VERSION_NAME]
+            end
           end
         when ".app"
           bucket_path = "#{path_for_app_name}/Mac"
