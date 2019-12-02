@@ -93,19 +93,26 @@ module Fastlane
         case File.extname(filename)
         when ".ipa"
           bucket_path = "#{path_for_app_name}/iOS"
+          # 如果无法从lane_context中获取则从实际的ipa文件中读取
+          if build_number.nil? || version_number.nil?
+            build_number = GetIpaInfoPlistValueAction.run(ipa: build_file, key: 'CFBundleVersion')
+            version_number = GetIpaInfoPlistValueAction.run(ipa: build_file, key: 'CFBundleShortVersionString')
+          end
         when ".apk"
           bucket_path = "#{path_for_app_name}/Android"
           # versionName、versionCode先从output.json文件里取
           apk_output_json_path = File.join(File.dirname(build_file), "output.json")
           if File.readable?(apk_output_json_path)
             apk_output_json = JSON.parse(File.read(apk_output_json_path))
-            build_number = apk_output_json.first["apkInfo"]["versionCode"]
-            version_number = apk_output_json.first["apkInfo"]["versionName"]
+            if !apk_output_json.first.nil? && !apk_output_json.first["apkInfo"].nil?
+              build_number = apk_output_json.first["apkInfo"]["versionCode"]
+              version_number = apk_output_json.first["apkInfo"]["versionName"]
+            end
           end
           # 如果output.json文件里取不到则从Actions.lane_context中取
           if build_number.nil? || version_number.nil?
             if Actions.lane_context[:ANDROID_VERSION_NAME].nil? || Actions.lane_context[:ANDROID_VERSION_CODE].nil?
-              UI.important "Actions.lane_context 不包含[ANDROID_VERSION_NAME, ANDROID_VERSION_CODE]，请配置fastlane env。"
+              UI.important "Actions.lane_context 不包含[ANDROID_VERSION_NAME, ANDROID_VERSION_CODE]，请配置fastlane env（推荐在Fastlane文件中使用fastlane-plugin-versioning_android获取versionCode/versionName）。"
             else
               build_number = Actions.lane_context[SharedValues::ANDROID_VERSION_CODE]
               version_number = Actions.lane_context[SharedValues::ANDROID_VERSION_NAME]
@@ -152,7 +159,6 @@ module Fastlane
           UI.message "配置 manifest.plist ..."
           app_name = GetIpaInfoPlistValueAction.run(ipa: build_file, key: 'CFBundleDisplayName')
           app_identifier = GetIpaInfoPlistValueAction.run(ipa: build_file, key: 'CFBundleIdentifier')
-          version_number = GetIpaInfoPlistValueAction.run(ipa: build_file, key: 'CFBundleShortVersionString')
           download_url = download_url
           UI.message "app_name: #{app_name}"
           UI.message "app_identifier: #{app_identifier}"
