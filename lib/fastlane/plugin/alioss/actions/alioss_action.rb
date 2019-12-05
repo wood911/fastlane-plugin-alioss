@@ -41,7 +41,7 @@ module Fastlane
           update_description = ""
         end
 
-        # start upload
+        # create aliyun oss client
         client = Aliyun::OSS::Client.new(
             endpoint: endpoint,
             access_key_id: access_key_id,
@@ -64,22 +64,39 @@ module Fastlane
         # must_bucket_file = ["app/config.json", "app/index.html"]
         unless bucket.object_exists?("#{path_for_app_name}/config.json")
           UI.message "配置文件不存在，初始化#{path_for_app_name}/config.json"
-          config_json_file = self.create_config_json_file(download_domain: download_domain)
+          config_json_file = self.create_config_json_file(
+              download_domain: download_domain,
+              html_header_title: html_header_title
+          )
           bucket.put_object("#{path_for_app_name}/config.json", :file => File.expand_path(config_json_file))
           # 上传完成后删除本地文件
           self.delete_file(file: config_json_file)
           UI.message "#{path_for_app_name}/config.json 配置完成"
         end
 
-        unless bucket.object_exists?("#{path_for_app_name}/index.html")
+        index_html_template_path = Helper::AliossHelper.index_html_template_path
+        UI.message "模板文件路径：#{index_html_template_path}"
+
+        if !bucket.object_exists?("#{path_for_app_name}/index.html")
           UI.message "配置文件不存在，初始化#{path_for_app_name}/index.html"
-          index_html_file = self.create_index_html_file(
-              html_header_title: html_header_title
-          )
-          bucket.put_object("#{path_for_app_name}/index.html", :file => File.expand_path(index_html_file))
-          # 上传完成后删除本地文件
-          self.delete_file(file: index_html_file)
+          bucket.put_object("#{path_for_app_name}/index.html", :file => index_html_template_path)
           UI.message "#{path_for_app_name}/index.html 配置完成"
+        else
+          if Alioss::VERSION >= "0.1.6"
+            temp_index_html_path = File.expand_path('temp_index.html')
+            bucket.get_object("#{path_for_app_name}/index.html", :file => temp_index_html_path)
+            temp_index_html = File.read(temp_index_html_path)
+            last_match_obj = temp_index_html.to_s.scan(/>version:(.*)<\/div>/).last
+            if last_match_obj.class == Array && !last_match_obj.empty?
+              html_version = last_match_obj.first
+              UI.message "index.html version: #{html_version}"
+            else
+              # 匹配不到版本号，是以前版本，上传新文件覆盖
+              bucket.put_object("#{path_for_app_name}/index.html", :file => index_html_template_path)
+              UI.message "成功更新index.html"
+            end
+            self.delete_file(file: temp_index_html_path)
+          end
         end
 
         file_size = File.size(build_file)
@@ -202,6 +219,7 @@ module Fastlane
         else
           UI.message ""
         end
+        config_json["title"] = html_header_title
 
         UI.message "配置 config_json ..."
         # 将新的json数据写入到config_json_file中
@@ -372,6 +390,7 @@ module Fastlane
     \"version\": \"0.1.0\",
     \"domain\": \"#{params[:download_domain]}\",
     \"desc\": \"每个版本的配置文件，记录着所有历史版本。\",
+    \"title\": \"#{params[:html_header_title]}\",
     \"ipaList\": [],
     \"apkList\": [],
     \"appList\": []
