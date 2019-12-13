@@ -90,7 +90,7 @@ class App extends React.Component {
       <LoadingOverlay active={isLoading} spinner text='Loading...'>
         <div className="App">
           <p>{headerTitle}</p>
-          <img src={"http://dl.superbuy.com/app/superbuy/icon.png"} className="App-icon" alt={""}/>
+          <img src={"icon.png"} className="App-icon" alt={""}/>
           <p className="App-detail-text">
             版本：{obj.version}
             (build {obj.build}) &nbsp;&nbsp;
