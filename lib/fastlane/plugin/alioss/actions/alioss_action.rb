@@ -59,6 +59,17 @@ module Fastlane
         end
         UI.message "======================================"
 
+        # 配置logo
+        unless bucket.object_exists?("#{path_for_app_name}/icon.png")
+          input = File.expand_path(UI.input("icon.png不存在，请上传您App的logo（120*120 <= 尺寸 <= 480*480），请输入文件路径（例如：~/Desktop/icon.png）："))
+          # 判断是一个普通文件 && 可读 && 扩展名是png
+          if File.readable_real?(input) && File.extname(input) == ".png"
+            bucket.put_object("#{path_for_app_name}/icon.png", :file => input)
+            UI.message "#{path_for_app_name}/icon.png 配置完成"
+          else
+            UI.important "文件不存在或无权限读写，请确认icon.png的文件路径"
+          end
+        end
 
         # 必须包含的文件，没有就引导去下载
         # must_bucket_file = ["app/config.json", "app/index.html"]
