@@ -131,10 +131,12 @@ module Fastlane
           # versionName、versionCode先从output.json文件里取
           apk_output_json_path = File.join(File.dirname(build_file), "output.json")
           if File.readable?(apk_output_json_path)
-            apk_output_json = JSON.parse(File.read(apk_output_json_path))
-            if !apk_output_json.first.nil? && !apk_output_json.first["apkInfo"].nil?
-              build_number = apk_output_json.first["apkInfo"]["versionCode"]
-              version_number = apk_output_json.first["apkInfo"]["versionName"]
+            apk_output_content = File.read(apk_output_json_path)
+            version_number_regex = /"versionName":"(\d+\.\d+\.\d+)"/.match(apk_output_content)
+            build_number_regex = /"versionCode":(\d+)/.match(apk_output_content)
+            if !version_number_regex.nil? && !build_number_regex.nil?
+              version_number = version_number_regex.captures.first
+              build_number = build_number_regex.captures.first
             end
           end
           # 如果output.json文件里取不到则从Actions.lane_context中取
