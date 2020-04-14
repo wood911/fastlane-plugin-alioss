@@ -16,6 +16,7 @@ module Fastlane
         access_key_secret = params[:access_key_secret]
         path_for_app_name = params[:app_name]
         html_header_title = params[:html_header_title]
+        list_buckets = params[:list_buckets]
 
         build_file = [
             params[:ipa],
@@ -51,11 +52,13 @@ module Fastlane
         bucket = client.get_bucket(bucket_name)
 
         # list all buckets
-        UI.message "========== list all buckets =========="
-        bucket_objects = []
-        bucket.list_objects.each do |o|
-          UI.message o.key
-          bucket_objects.push(o.key)
+        unless list_buckets.nil? || %w(NO no false FALSE).include?(list_buckets) || list_buckets == false
+          UI.message "========== list all buckets =========="
+          bucket_objects = []
+          bucket.list_objects.each do |o|
+            UI.message o.key
+            bucket_objects.push(o.key)
+          end
         end
         UI.message "======================================"
 
@@ -332,7 +335,12 @@ module Fastlane
                                          env_name: "ALIOSS_UPDATE_DESCRIPTION",
                                          description: "设置app更新日志，描述你修改了哪些内容。",
                                          optional: true,
-                                         type: String)
+                                         type: String),
+            FastlaneCore::ConfigItem.new(key: :list_buckets,
+                                         env_name: "ALIOSS_LIST_BUCKETS",
+                                         description: "是否列出已经上传的所有的buckets",
+                                         default_value: nil,
+                                         optional: true)
         ]
       end
 

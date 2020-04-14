@@ -5,6 +5,7 @@ import DeviceDetector from 'device-detector-js';
 import format from 'date-format';
 import QRCode from 'qr-code-with-logo';
 import LoadingOverlay from 'react-loading-overlay';
+// import { Link } from 'react-router-dom';
 
 class App extends React.Component {
   constructor(props) {
@@ -105,6 +106,9 @@ class App extends React.Component {
                   <span className="App-install-button-text"> {isInstalling ? "正在安装..." : "安装App"}</span>
                 </i>
               </button>
+          }
+          {
+            device.os.name === 'iOS' || true ? <a href="https://www.pgyer.com/tools/udid" className="App-help">安装遇到问题？</a> : null
           }
           <canvas ref={this.ref} />
           <div className="App-line"> </div>

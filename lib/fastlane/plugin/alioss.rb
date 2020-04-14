@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 require 'fastlane/plugin/alioss/version'
 
 module Fastlane

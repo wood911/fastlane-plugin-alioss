@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 require 'fastlane_core/ui/ui'
 
 module Fastlane

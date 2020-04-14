@@ -1,0 +1,43 @@
+.Help {
+  text-align: center;
+  background-color: white;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #333333;
+  padding: 30px;
+}
+
+.pad-phone {
+  height: 270px;
+}
+
+.pad-phone-app {
+  height: 220px;
+}
+
+.detail-text {
+  font-size: calc(10px + 0.8vmin);
+  color: #999999;
+}
+
+.qr-code {
+  margin: 30px;
+}
+
+.qr-code-app {
+  margin: 30px;
+  display: none;
+}
+
+.udid-button {
+  cursor: pointer;
+  background-color: #28caad;
+  padding: 8px 40px 10px 40px;
+  border-radius: 30px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 20px;
+}
