@@ -6,6 +6,14 @@ require 'json'
 
 module Fastlane
   module Actions
+    module SharedValues
+      BUILD_NUMBER = :BUILD_NUMBER
+      VERSION_NUMBER = :VERSION_NUMBER
+      PUBLISH_TIMESTAMP = :PUBLISH_TIMESTAMP
+      FILE_SIZE = :FILE_SIZE
+      DOWNLOAD_URL = :DOWNLOAD_URL
+    end
+
     class AliossAction < Action
       def self.run(params)
         UI.message("The alioss plugin is working!")
@@ -185,6 +193,12 @@ module Fastlane
             "build" => build_number,
             "time" => timestamp.to_i
         }
+        # Store the build_number, version_number, time, size
+        Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
+        Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
+        Actions.lane_context[SharedValues::PUBLISH_TIMESTAMP] = timestamp.to_i
+        Actions.lane_context[SharedValues::FILE_SIZE] = file_size
+        Actions.lane_context[SharedValues::DOWNLOAD_URL] = "#{download_domain}#{path_for_app_name}/index.html"
 
         # 根据不同的平台，将bucket_path记录到json中
         case File.extname(filename)
@@ -192,7 +206,6 @@ module Fastlane
           UI.message "配置 manifest.plist ..."
           app_name = GetIpaInfoPlistValueAction.run(ipa: build_file, key: 'CFBundleDisplayName')
           app_identifier = GetIpaInfoPlistValueAction.run(ipa: build_file, key: 'CFBundleIdentifier')
-          download_url = download_url
           UI.message "app_name: #{app_name}"
           UI.message "app_identifier: #{app_identifier}"
           UI.message "version_number: #{version_number}"
@@ -257,6 +270,16 @@ module Fastlane
 
       def self.authors
         ["woodwu"]
+      end
+
+      def self.output
+        [
+            ['BUILD_NUMBER', 'Update the new build number(version code) of your iOS/Android project'],
+            ['VERSION_NUMBER', 'Update the new version number(version name) of your iOS/Android project'],
+            ['PUBLISH_TIMESTAMP', 'The timestamp of auto-build'],
+            ['FILE_SIZE', 'The size of your ipa/apk file'],
+            ['DOWNLOAD_URL', 'The website url that you can download it']
+        ]
       end
 
       def self.return_value
@@ -350,6 +373,23 @@ module Fastlane
         #
         # [:ios, :mac, :android].include?(platform)
         true
+      end
+
+      def self.example_code
+        [
+            # 上传App到阿里云oss服务器
+            'alioss(
+                endpoint: "oss-cn-shenzhen.aliyuncs.com",
+                access_key_id: "xxxxx",
+                access_key_secret: "xxxxx",
+                bucket_name: "cn-app-test",
+                app_name: "app/appname",
+                download_domain: "https://dl.yourdomain.com/",
+                update_description: "update description",
+                ipa: "valid ipa path", # iOS project required
+                apk: "valid apk path" # Android project required
+            )'
+        ]
       end
 
       def self.create_manifest_file(params)
