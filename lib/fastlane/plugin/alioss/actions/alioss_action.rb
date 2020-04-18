@@ -7,11 +7,11 @@ require 'json'
 module Fastlane
   module Actions
     module SharedValues
-      BUILD_NUMBER = :BUILD_NUMBER
-      VERSION_NUMBER = :VERSION_NUMBER
-      PUBLISH_TIMESTAMP = :PUBLISH_TIMESTAMP
-      FILE_SIZE = :FILE_SIZE
-      DOWNLOAD_URL = :DOWNLOAD_URL
+      ALIOSS_BUILD_NUMBER = :ALIOSS_BUILD_NUMBER
+      ALIOSS_VERSION_NUMBER = :ALIOSS_VERSION_NUMBER
+      ALIOSS_PUBLISH_TIMESTAMP = :ALIOSS_PUBLISH_TIMESTAMP
+      ALIOSS_FILE_SIZE = :ALIOSS_FILE_SIZE
+      ALIOSS_DOWNLOAD_URL = :ALIOSS_DOWNLOAD_URL
     end
 
     class AliossAction < Action
@@ -194,11 +194,11 @@ module Fastlane
             "time" => timestamp.to_i
         }
         # Store the build_number, version_number, time, size
-        Actions.lane_context[SharedValues::BUILD_NUMBER] = build_number
-        Actions.lane_context[SharedValues::VERSION_NUMBER] = version_number
-        Actions.lane_context[SharedValues::PUBLISH_TIMESTAMP] = timestamp.to_i
-        Actions.lane_context[SharedValues::FILE_SIZE] = file_size
-        Actions.lane_context[SharedValues::DOWNLOAD_URL] = "#{download_domain}#{path_for_app_name}/index.html"
+        Actions.lane_context[SharedValues::ALIOSS_BUILD_NUMBER] = build_number
+        Actions.lane_context[SharedValues::ALIOSS_VERSION_NUMBER] = version_number
+        Actions.lane_context[SharedValues::ALIOSS_PUBLISH_TIMESTAMP] = timestamp.to_i
+        Actions.lane_context[SharedValues::ALIOSS_FILE_SIZE] = file_size
+        Actions.lane_context[SharedValues::ALIOSS_DOWNLOAD_URL] = "#{download_domain}#{path_for_app_name}/index.html"
 
         # 根据不同的平台，将bucket_path记录到json中
         case File.extname(filename)
@@ -274,11 +274,11 @@ module Fastlane
 
       def self.output
         [
-            ['BUILD_NUMBER', 'Update the new build number(version code) of your iOS/Android project'],
-            ['VERSION_NUMBER', 'Update the new version number(version name) of your iOS/Android project'],
-            ['PUBLISH_TIMESTAMP', 'The timestamp of auto-build'],
-            ['FILE_SIZE', 'The size of your ipa/apk file'],
-            ['DOWNLOAD_URL', 'The website url that you can download it']
+            ['ALIOSS_BUILD_NUMBER', 'Update the new build number(version code) of your iOS/Android project'],
+            ['ALIOSS_VERSION_NUMBER', 'Update the new version number(version name) of your iOS/Android project'],
+            ['ALIOSS_PUBLISH_TIMESTAMP', 'The timestamp of auto-build'],
+            ['ALIOSS_FILE_SIZE', 'The size of your ipa/apk file'],
+            ['ALIOSS_DOWNLOAD_URL', 'The website url that you can download it']
         ]
       end
 
