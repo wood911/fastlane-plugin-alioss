@@ -72,7 +72,7 @@ module Fastlane
 
         # 配置logo
         unless bucket.object_exists?("#{path_for_app_name}/icon.png")
-          input = File.expand_path(UI.input("icon.png不存在，请上传您App的logo（120*120 <= 尺寸 <= 480*480），请输入文件路径（例如：~/Desktop/icon.png）："))
+          input = File.expand_path(UI.input("icon.png不存在，请上传您App的logo（120*120 <= 尺寸 <= 480*480），请输入文件路径（例如：/Users/xxx/Desktop/icon.png）："))
           # 判断是一个普通文件 && 可读 && 扩展名是png
           if File.readable_real?(input) && File.extname(input) == ".png"
             bucket.put_object("#{path_for_app_name}/icon.png", :file => input)
@@ -112,6 +112,12 @@ module Fastlane
             if last_match_obj.class == Array && !last_match_obj.empty?
               html_version = last_match_obj.first
               UI.message "index.html version: #{html_version}"
+              if html_version < "0.1.8"
+                # 这里最好是跟本地版本作比较，如果大于线上版本号就更新
+                UI.message "发现index.html有新版本0.1.8，开始更新"
+                bucket.put_object("#{path_for_app_name}/index.html", :file => index_html_template_path)
+                UI.message "成功更新index.html"
+              end
             else
               # 匹配不到版本号，是以前版本，上传新文件覆盖
               bucket.put_object("#{path_for_app_name}/index.html", :file => index_html_template_path)
