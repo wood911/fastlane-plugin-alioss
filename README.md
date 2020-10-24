@@ -65,6 +65,80 @@ MacOS & Windows环境配置好后，需要安装fastlane插件以支持iOS、And
 
 [完整的fastlane配置for iOS/Android](doc/fastlane配置.zip) <br>
 
+如下是脚本片段，具体配置可以参考上面的链接。
+
+```ruby
+def upload_to_alioss(param)
+  description = "正式环境"
+  UI.message "====== upload_to_alioss ======\nparam入参：#{param}\n"
+  if param[:mode] == "debug"
+    description = "测试环境"
+  end
+  # 上传App到阿里云oss服务器
+  alioss(
+    endpoint: "oss-xxx.aliyuncs.com", # 您的站点 找运维要
+    access_key_id: "xxxxxx",          # 您的id 找运维要
+    access_key_secret: "xxxxxx",      # 您的秘钥 找运维要
+    bucket_name: "app-test",          # 存放app文件的目录，自行创建
+    app_name: "app/app1",             # 在bucket_name下面创建app目录，app下面可以分不同的app
+    # 有了endpoint就有了下载链接 找运维要
+    # 原始链接是这样：https://#{bucket_name}.#{endpoint} -> https://app-test.oss-xxx.aliyuncs.com/
+    # 但是为了好记，请求运维给一个以你们公司名义命名的链接 -> https://dl.app.com/
+    # 设置download_domain后，会生成：https://dl.app.com/app/app1/index.html
+    # 最后包这个链接变成二维码，即可实现扫码下载
+    download_domain: "https://dl.app.com/",
+    update_description: "#{param[:desc]}\n#{description}",
+    ipa: param[:ipa],
+    apk: param[:apk]
+  )
+  store_shared_values
+end
+
+
+############################################### iOS #############################################
+platform :ios do
+
+  # 所有lane动作开始前都会执行这里的命令，例如指定打master上的包或执行project clean
+  before_all do |options|
+    ensure_git_status_clean
+    git_pull
+    sh("flutter pub get") 
+    cocoapods(use_bundle_exec: false, podfile: "./ios/Podfile")
+  end
+
+  desc "构建一个测试环境版本上传至阿里云"
+  lane :debug do|option|
+    build_sign_app(mode: "debug")
+    upload_to_alioss(desc: option[:desc], mode: "debug")
+  end
+
+  desc "构建一个正式环境版本上传至阿里云"
+  lane :release do|option|
+    build_sign_app(mode: "release")
+    upload_to_alioss(desc: option[:desc])
+  end
+
+  desc "构建一个正式环境版本上传至AppStore"
+  lane :appstore do|option|
+    sign_appstore
+    build_app(
+      export_method: "app-store",
+      workspace: "./ios/app.xcworkspace",
+      scheme: "app",
+      configuration: "Release",
+      clean: true,
+      output_directory: "./build/output/AppStore_#{Time.now.strftime('%Y%m%d%H%M%S')}",
+      output_name: "app.ipa"
+    )
+    upload_to_app_store(app_identifier: "com.xxx.xxx")
+    commit_version_bump(message: '[ci-skip] Bump build', xcodeproj: './ios/app.xcodeproj')
+    push_to_git_remote
+  end
+
+end
+
+```
+
 
 ## Example
 
