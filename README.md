@@ -2,6 +2,13 @@
 
 [![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-alioss)
 
+---
+## [fastlane移植到Linux平台项目开源了](https://github.com/wood911/fastlane-onLinux)
+
+fastlane移植到Linux平台，所有的签名和多仓库证书管理都在Linux上完成，证书可以云同步至aws或minio，适合做超级签系统，提供cmd让Java或go调用，可以配置N个苹果账号，默认是P8私钥认证有问题时切换为两步验证(短信验证码，token可以保存1个月)，选择好策略不用担心掉签问题
+
+---
+
 ## Getting Started
 
 This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-alioss`, add it to your project by running:
